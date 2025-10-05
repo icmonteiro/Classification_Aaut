@@ -1,17 +1,17 @@
-import numpy as np
+# mymodel.py
 import joblib
-#from utils import patient_features
+import numpy as np
 
-# Carregar o modelo
+from utils import patient_features  # feature engineering function
+
+# Load trained model once
 model_data = joblib.load("classification_model.pkl")
 model = model_data['model']
-scaler = model_data['scaler']
 
-def predict(Xtest):
+def predict(X_test):
     """
-    Xtest: np.array de shape (200,132)
-    retorna: np.array de shape (200,) com as previsões
+    Receives X_test: shape (N,132)
+    Returns predictions: shape (N,)
     """
-    X_features = patient_features(Xtest)
-    X_scaled = scaler.transform(X_features)
-    return model.predict(X_scaled)
+    X_features = patient_features(X_test)  # transform to 105 features
+    return model.predict(X_features)
