@@ -30,7 +30,15 @@ def patient_features(X):
     lower_mov = movement[:, [23, 24, 27, 28]].mean(axis=1)
     mov_ratio = upper_mov / (lower_mov + 1e-6)
 
-    extra_features = np.column_stack([d_rh_head, d_lh_head, d_rk_hip, d_lk_hip, hand_elevation, mov_ratio])
+    #extra_features = np.column_stack([d_rh_head, d_lh_head, d_rk_hip, d_lk_hip, hand_elevation, mov_ratio])
+    # New features for hand positions relative to face
+    # Assuming keypoint 0 is head/nose, add relative y positions
+    rh_y_rel = avg_norm[:, 15, 1] - avg_norm[:, 0, 1]  # right hand y relative to head
+    lh_y_rel = avg_norm[:, 16, 1] - avg_norm[:, 0, 1]  # left hand y relative to head
+    rh_x_rel = avg_norm[:, 15, 0]  # right hand x position (centered)
+    lh_x_rel = avg_norm[:, 16, 0]  # left hand x position (centered)
+ 
+    extra_features = np.column_stack([d_rh_head, d_lh_head, d_rk_hip, d_lk_hip, hand_elevation, mov_ratio, rh_y_rel, lh_y_rel, rh_x_rel, lh_x_rel])
 
     # Concatenate all: 66 + 33 + 6 = 105
     X_new = np.hstack([avg_norm.reshape(n, -1), movement, extra_features])

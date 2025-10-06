@@ -6,7 +6,7 @@
 #   Inês Monteiro (ist1113307)
 #   Tiago Anastácio (ist1116348)
 #
-# Date: 5th October
+# Date: 11th October
 # ===============================================================
 
 import numpy as np
