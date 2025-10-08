@@ -64,7 +64,7 @@ model_grids = {
     },
     'SVM RBF': {
         'pipeline': Pipeline([('scaler', StandardScaler()), ('clf', SVC(kernel='rbf', class_weight='balanced', random_state=42))]),
-        'params': {'clf__C':[0.1,1,10], 'clf__gamma':['scale','auto']}
+        'params': {'clf__C':[0.5, 1, 2, 5, 10, 25], 'clf__degree':[2, 3], 'clf__gamma':['scale', 0.01, 0.1, 0.5, 1]}
     },
     'Decision Tree': {
         'pipeline': Pipeline([('scaler', StandardScaler()), ('clf', DecisionTreeClassifier(class_weight='balanced', random_state=42))]),
@@ -72,11 +72,12 @@ model_grids = {
     },
     'Random Forest': {
         'pipeline': Pipeline([('scaler', StandardScaler()), ('clf', RandomForestClassifier(class_weight='balanced', random_state=42))]),
-        'params': {'clf__n_estimators':[50,100,200],'clf__max_depth':[None,10,20],'clf__min_samples_split':[2,5]}
+        'params': {'clf__n_estimators':[50,100,200], 'clf__max_depth':[None,10,20],'clf__min_samples_split':[2,5]}
     },
     'MLP': {
         'pipeline': Pipeline([('scaler', StandardScaler()), ('clf', MLPClassifier(max_iter=1000, random_state=42, early_stopping=True))]),
-        'params': {'clf__hidden_layer_sizes':[(100,),(100,50),(150,50)], 'clf__alpha':[0.0001,0.001,0.01]}
+        'params': {'clf__hidden_layer_sizes':[(100, 50), (150, 100), (200, 100), (250, 100), (100, 50, 25)], 'clf__alpha':[0.00001, 0.0001, 0.001], 'clf__learning_rate_init': [0.001, 0.01]
+        }
     }
 }
 
@@ -91,7 +92,7 @@ for name, mg in model_grids.items():
     grid = GridSearchCV(
         estimator=mg['pipeline'],
         param_grid=mg['params'],
-        scoring='f1_macro',
+        scoring='f1_macro',   
         cv=logo,
         n_jobs=-1
     )
@@ -134,6 +135,8 @@ print("\nGenerating LOPO out-of-fold predictions for confusion matrix...")
 y_pred_lopo = cross_val_predict(best_model, X_features, Y_train, groups=groups, cv=logo, method='predict')
 cm_lopo = confusion_matrix(Y_train, y_pred_lopo)
 
+
+
 plt.figure(figsize=(6, 5))
 plt.imshow(cm_lopo, cmap='Blues')
 plt.title(f'Confusion Matrix (LOPO out-of-fold) - {best_name}')
@@ -162,5 +165,5 @@ model_data = {
     'f1_score': results_lopo[best_name]
 }
 
-joblib.dump(model_data, "classification_model.pkl")
+#joblib.dump(model_data, "classification_model.pkl")
 print(f"\nBest model saved as 'classification_model.pkl' ({best_name})")
