@@ -48,35 +48,33 @@ print("Transforming features...")
 X_features = patient_features(X_raw)
 print(f"Original shape: {X_raw.shape}, Engineered shape: {X_features.shape}")
 
+
 # -------------------------
 # Define Models and Parameter Grids
 # -------------------------
 logo = LeaveOneGroupOut()
 
 model_grids = {
-    'kNN': {
-        'pipeline': Pipeline([('scaler', StandardScaler()), ('clf', KNeighborsClassifier())]),
-        'params': {'clf__n_neighbors':[3,5,7], 'clf__weights':['uniform','distance']}
-    },
-    'Naive Bayes': {
-        'pipeline': Pipeline([('scaler', StandardScaler()), ('clf', GaussianNB())]),
-        'params': {}
-    },
     'SVM RBF': {
-        'pipeline': Pipeline([('scaler', StandardScaler()), ('clf', SVC(kernel='rbf', class_weight='balanced', random_state=42))]),
-        'params': {'clf__C':[0.1,1,10], 'clf__gamma':['scale','auto']}
-    },
-    'Decision Tree': {
-        'pipeline': Pipeline([('scaler', StandardScaler()), ('clf', DecisionTreeClassifier(class_weight='balanced', random_state=42))]),
-        'params': {'clf__max_depth':[None,5,10,20], 'clf__min_samples_split':[2,5,10]}
+        'pipeline': Pipeline([
+            ('scaler', StandardScaler()),
+            ('clf', SVC(kernel='rbf', class_weight='balanced', random_state=42))
+        ]),
+        'params': {'clf__C':[1,5,10,20,50], 'clf__gamma':['scale', 0.01, 0.1, 1]}
     },
     'Random Forest': {
-        'pipeline': Pipeline([('scaler', StandardScaler()), ('clf', RandomForestClassifier(class_weight='balanced', random_state=42))]),
-        'params': {'clf__n_estimators':[50,100,200],'clf__max_depth':[None,10,20],'clf__min_samples_split':[2,5]}
+        'pipeline': Pipeline([
+            ('scaler', StandardScaler()),
+            ('clf', RandomForestClassifier(class_weight='balanced', random_state=42))
+        ]),
+        'params': {'clf__n_estimators':[100,200], 'clf__max_depth':[10,20,None]}
     },
     'MLP': {
-        'pipeline': Pipeline([('scaler', StandardScaler()), ('clf', MLPClassifier(max_iter=1000, random_state=42, early_stopping=True))]),
-        'params': {'clf__hidden_layer_sizes':[(100,),(100,50),(150,50)], 'clf__alpha':[0.0001,0.001,0.01]}
+        'pipeline': Pipeline([
+            ('scaler', StandardScaler()),
+            ('clf', MLPClassifier(max_iter=1000, early_stopping=True, random_state=42))
+        ]),
+        'params': {'clf__hidden_layer_sizes':[(100,),(100,50)], 'clf__alpha':[0.0001,0.001]}
     }
 }
 
